@@ -1,2 +1,2 @@
 # psd-to-css
-Convert Photoshop Drop Shadows to CSS3 Box
+https://sduu.github.io/psd-to-css/
