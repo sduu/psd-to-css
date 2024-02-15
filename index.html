@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Convert Photoshop Drop Shadows to CSS3 Box & Text Shadows</title>
+  <script defer src="js/convert-psd-to-css3.js"></script>
+</head>
+<body>
+  <div>
+    <form class="from-ps">
+      <fieldset>
+        <legend>Photoshop Drop Shadow</legend>
+        <div>
+          <label>Color</label>
+          <input type="text" name="red" value="0">
+          <span>R</span>
+        </div>
+        <div>
+          <input type="text" name="green" value="0">
+          <span>G</span>
+        </div>
+        <div>
+          <input type="text" name="blue" value="0">
+          <span>B</span>
+        </div>
+        <div>
+          <label>Opacity</label>
+          <input type="text" name="opacity" value="">
+          <span>%</span>
+        </div>
+        <div>
+          <label>Angle</label>
+          <input type="text" name="angle" value="">
+          <span>&deg;</span>
+        </div>
+        <div>
+          <label>Distance</label>
+          <input type="text" name="distance" value="">
+          <span>px</span>
+        </div>
+        <div>
+          <label>Spread</label>
+          <input type="text" name="spread" value="">
+          <span>%</span>
+        </div>
+        <div>
+          <label>Size</label>
+          <input type="text" name="size" value="">
+          <span>px</span>
+        </div>
+        <div>
+          <a href="#" class="set-ps-default">Ps Default Values</a>
+          <a class="generate-css" href="#">Ps to CSS</a>
+        </div>
+      </fieldset>
+    </form>
+
+    <form class="css3-box-shadow">
+      <fieldset>
+        <legend>CSS3 Syntax</legend>
+        <div>
+          <label>Inset?</label>
+          <select name="inset" size="1" class="watch">
+            <option selected value="No">No</option>
+            <option value="Yes">Yes</option>
+          </select>
+        </div>
+        <div>
+          <label>Horizontal Length</label>
+          <input type="text" name="offset-x" value="" class="watch">
+          <span>px</span>
+        </div>
+        <div>
+          <label>Vertical Length</label>
+          <input type="text" name="offset-y" value="" class="watch">
+          <span>px</span>
+        </div>
+        <div>
+          <label>Blur Radius</label>
+          <input type="text" name="blur-radius" value="" class="watch">
+          <span>px</span>
+        </div>
+        <div>
+          <label>Spread</label>
+          <input type="text" name="spreadrad" value="" class="watch">
+          <span>px</span>
+        </div>
+        <div>
+          <label>Opacity</label>
+          <input type="text" name="css-opacity" value="" class="watch">
+        </div>
+        <div>
+          <a class="generate-ps" href="#">CSS to Ps</a>
+        </div>
+      </fieldset>
+    </form>
+
+    <div>
+      <h3>CSS Preview</h3>
+      <div class="box-shadow-preview">
+        Box Shadow Preview
+      </div>
+      <h4 class="text-shadow-preview">Text Shadow Preview</h4>
+    </div>
+  </div>
+
+  <div>
+    <h3>CSS3</h3>
+
+    <div class="output">
+      <span class="syntax">
+        box-shadow: offset-x offset-y blur-radius spread-radius rgba(0, 0, 0, opacity) inset; <br /><br />
+        text-shadow: offset-x offset-y blur-radius rgba(0,0,0 opacity);
+      </span>
+      <span class="generated">
+        box-shadow: <span class="offset-x">offset-x</span>px <span class="offset-y">offset-y</span>px <span class="blur-radius">blur-radius</span>px <span class="spread-radius">spread-radius</span>px rgba(<span class="r">0</span>, <span class="g">0</span>, <span class="b">0</span>, <span class="css-opacity">opacity</span>)<span class="css-inset"> inset</span>; <br /><br />
+        text-shadow: <span class="offset-x">offset-x</span>px <span class="offset-y">offset-y</span>px <span class="blur-radius">blur-radius</span>px rgba(<span class="r">0</span>, <span class="g">0</span>, <span class="b">0</span>, <span class="css-opacity">opacity</span>)<span class="css-inset"> inset</span>; <br />
+      </span>
+    </div>
+    <a class="clear-btn" href="#">Clear All</a>
+  </div>
+</body>
+</html>
