@@ -1,181 +1,131 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const doCSSMaths = () => {
-    const getValue = name => document.querySelector(`input[name="${name}"]`).value;
-    const opacity = getValue('opacity');
-    const ang = getValue('angle');
-    const dist = getValue('distance');
-    const spread = getValue('spread');
-    const size = getValue('size');
-    const r = getValue('red');
-    const g = getValue('green');
-    const b = getValue('blue');
-    const ins = document.querySelector('select[name="inset"]').value;
+  const getInputValue = inputs => {
+    return [...inputs].reduce((acc, cur) => {
+      acc[cur.name] = cur.value;
+      return acc;
+    }, {});
+  };
+  const getDropValues = () => getInputValue(document.querySelectorAll('.from-ps input'));
+  const getCssValues = () => getInputValue(document.querySelectorAll('.css3-box-shadow input'));
 
-    const cssopacity = opacity / 100;
-    document.querySelector('input[name="css-opacity"]').value = cssopacity;
-    document.querySelector('.output .css-opacity').textContent = cssopacity;
+  const convertToCss = values => {
+    const { red, green, blue, opacity, angle, distance, spread, size } = values;
 
-    const angInRadians = ((180 - ang) * Math.PI) / 180;
+    const angInRadians = ((180 - angle) * Math.PI) / 180;
+    const offsetY = Math.round(Math.sin(angInRadians) * distance);
+    const offsetX = Math.round(Math.cos(angInRadians) * distance);
+    const spreadRad = (size * spread) / 100;
+    const blurRad = size - spreadRad;
+    const cssOpacity = opacity / 100;
+    const inset = document.querySelector('select[name="inset"]').value === 'yes' ? ' inset' : '';
 
-    const offsety = Math.round(Math.sin(angInRadians) * dist);
-    document.querySelector('input[name="offset-y"]').value = offsety;
-    document.querySelector('.output .offset-y').textContent = offsety;
-
-    const offsetx = Math.round(Math.cos(angInRadians) * dist);
-    document.querySelector('input[name="offset-x"]').value = offsetx;
-    document.querySelector('.output .offset-x').textContent = offsetx;
-
-    const spreadrad = (size * spread) / 100;
-    document.querySelector('input[name="spreadrad"]').value = spreadrad;
-    document.querySelector('.output .spread-radius').textContent = spreadrad;
-
-    const blurrad = size - spreadrad;
-    document.querySelector('input[name="blur-radius"]').value = blurrad;
-    document.querySelector('.output .blur-radius').textContent = blurrad;
-
-    document.querySelector('.output .r').textContent = r;
-    document.querySelector('.output .g').textContent = g;
-    document.querySelector('.output .b').textContent = b;
-
-    if (ins === 'Yes') {
-      document.querySelector('.output .css-inset').textContent = ' inset';
-      document.querySelector('.output .css-inset').style.display = 'inline';
-    } else {
-      document.querySelector('.output .css-inset').style.display = 'none';
-    }
-
-    updatePreview();
+    return { red, green, blue, offsetX, offsetY, blurRad, spreadRad, cssOpacity, inset };
   };
 
-  const updatePreview = () => {
-    const offsetx = document.querySelector('input[name="offset-x"]').value;
-    const offsety = document.querySelector('input[name="offset-y"]').value;
-    const blurrad = document.querySelector('input[name="blur-radius"]').value;
-    const spreadrad = document.querySelector('input[name="spreadrad"]').value;
-    const cssopacity = document.querySelector('input[name="css-opacity"]').value;
-    const r = document.querySelector('input[name="red"]').value;
-    const g = document.querySelector('input[name="green"]').value;
-    const b = document.querySelector('input[name="blue"]').value;
-    const ins = document.querySelector('select[name="inset"]').value;
+  const getDefaultPsValues = () => ({
+    red: '0',
+    green: '0',
+    blue: '0',
+    opacity: '75',
+    angle: '120',
+    distance: '5',
+    spread: '0',
+    size: '5',
+  });
 
-    let boxshadowval;
-    if (ins === 'Yes') {
-      boxshadowval = `${offsetx}px ${offsety}px ${blurrad}px ${spreadrad}px rgba(${r}, ${g}, ${b}, ${cssopacity}) inset`;
-    } else {
-      boxshadowval = `${offsetx}px ${offsety}px ${blurrad}px ${spreadrad}px rgba(${r}, ${g}, ${b}, ${cssopacity})`;
-    }
+  const convertToPs = values => {
+    if (!values) return getDefaultPsValues();
 
-    document.querySelector('.box-shadow-preview').style.boxShadow = boxshadowval;
+    const { offsetX, offsetY, blurRad, spreadRad, cssOpacity } = values;
 
-    const textshadowval = `${offsetx}px ${offsety}px ${blurrad}px rgba(${r}, ${g}, ${b}, ${cssopacity})`;
-    document.querySelector('.text-shadow-preview').style.textShadow = textshadowval;
+    const red = 0;
+    const green = 0;
+    const blue = 0;
+    const opacity = cssOpacity * 100;
+    const distance = Math.sqrt(Math.pow(offsetX, 2) + Math.pow(offsetY, 2));
+    const angle = Math.atan(parseInt(offsetY) / parseInt(offsetX));
+    const spread = (spreadRad / (spreadRad + blurRad)) * 100;
+    const size = parseInt(spreadRad) + parseInt(blurRad);
+
+    return { red, green, blue, opacity, angle, distance, spread, size };
   };
 
-  const doPSMaths = () => {
-    const offsetx = document.querySelector('input[name="offset-x"]').value;
-    const offsety = document.querySelector('input[name="offset-y"]').value;
-    const blurrad = document.querySelector('input[name="blur-radius"]').value;
-    const spreadrad = document.querySelector('input[name="spreadrad"]').value;
-    const cssopacity = document.querySelector('input[name="css-opacity"]').value;
+  const convertToSyntax = values => {
+    const { offsetX, offsetY, blurRad, spreadRad, red, green, blue, cssOpacity, inset } = values;
+    const boxShadow = `${offsetX}px ${offsetY}px ${blurRad}px ${spreadRad}px rgba(${red}, ${green}, ${blue}, ${cssOpacity})${inset}`;
+    const textShadow = `${offsetX}px ${offsetY}px ${blurRad}px rgba(${red}, ${green}, ${blue}, ${cssOpacity})`;
 
-    const opacity = cssopacity * 100;
-    document.querySelector('input[name="opacity"]').value = opacity;
-
-    const dist = Math.sqrt(Math.pow(offsetx, 2) + Math.pow(offsety, 2));
-    document.querySelector('input[name="distance"]').value = dist;
-
-    const ang = Math.atan(offsety / offsetx);
-    document.querySelector('input[name="angle"]').value = ang;
-
-    const spread = (spreadrad / (spreadrad + blurrad)) * 100;
-    document.querySelector('input[name="spread"]').value = spread;
-
-    const size = parseInt(spreadrad) + parseInt(blurrad);
-    document.querySelector('input[name="size"]').value = size;
+    return { boxShadow, textShadow };
   };
 
-  const doCodes = () => {
-    const inset = document.querySelector('select[name="inset"]').value;
-    const offsetx = document.querySelector('input[name="offset-x"]').value;
-    const offsety = document.querySelector('input[name="offset-y"]').value;
-    const blurrad = document.querySelector('input[name="blur-radius"]').value;
-    const spreadrad = document.querySelector('input[name="spread"]').value;
-    const r = document.querySelector('input[name="red"]').value;
-    const g = document.querySelector('input[name="green"]').value;
-    const b = document.querySelector('input[name="blue"]').value;
-    const cssopacity = document.querySelector('input[name="css-opacity"]').value;
-    document.querySelector('.output .offset-x').textContent = offsetx;
-    document.querySelector('.output .offset-y').textContent = offsety;
-    document.querySelector('.output .blur-radius').textContent = blurrad;
-    document.querySelector('.output .spread-radius').textContent = spreadrad;
-    document.querySelector('.output .r').textContent = r;
-    document.querySelector('.output .g').textContent = g;
-    document.querySelector('.output .b').textContent = b;
-    document.querySelector('.output .css-opacity').textContent = cssopacity;
-    if (inset === 'Yes') {
-      document.querySelector('.output .css-inset').textContent = ' inset';
-      document.querySelector('.output .css-inset').style.display = 'inline';
-    } else {
-      document.querySelector('.output .css-inset').style.display = 'none';
-    }
-  };
-
-  const attachEventListeners = () => {
-    const generateCSSButton = document.querySelector('a.generate-css');
-    const generatePSButton = document.querySelector('a.generate-ps');
-    const setPSDefaultButton = document.querySelector('a.set-ps-default');
-    const clearButton = document.querySelector('a.clear-btn');
-    const watchInputs = document.querySelectorAll('.watch');
-
-    generateCSSButton.addEventListener('click', event => {
-      event.preventDefault();
-      doCSSMaths();
-      document.querySelector('.output .syntax').style.display = 'none';
-      document.querySelector('.output .generated').style.display = 'block';
-    });
-
-    generatePSButton.addEventListener('click', event => {
-      event.preventDefault();
-      doPSMaths();
-    });
-
-    setPSDefaultButton.addEventListener('click', event => {
-      event.preventDefault();
-      document.querySelector('.output .generated').style.display = 'none';
-      document.querySelector('.output .syntax').style.display = 'block';
-      const defaultValues = {
-        red: '0',
-        green: '0',
-        blue: '0',
-        opacity: '75',
-        angle: '120',
-        distance: '5',
-        spread: '0',
-        size: '5',
-      };
-      for (const [key, value] of Object.entries(defaultValues)) {
-        document.querySelector(`input[name="${key}"]`).value = value;
+  const displayInputs = (inputsEl, values) => {
+    [...inputsEl].forEach(input => {
+      if (values && input.name in values) {
+        input.value = values[input.name];
       }
-      doCSSMaths();
-      document.querySelector('.output .syntax').style.display = 'none';
-      document.querySelector('.output .generated').style.display = 'block';
-    });
-
-    clearButton.addEventListener('click', event => {
-      event.preventDefault();
-      document.querySelector('form.from-ps').reset();
-      document.querySelector('form.css3-box-shadow').reset();
-      document.querySelector('.output .generated').style.display = 'none';
-      document.querySelector('.output .syntax').style.display = 'block';
-    });
-
-    watchInputs.forEach(input => {
-      input.addEventListener('change', () => {
-        doCodes();
-        updatePreview();
-      });
     });
   };
 
-  attachEventListeners();
+  const displayPreview = css => {
+    const boxPreview = document.querySelector('.box-shadow-preview');
+    const textPreview = document.querySelector('.text-shadow-preview');
+    const codeBox = document.querySelector('.output code');
+
+    if (!css) {
+      boxPreview.style.boxShadow = '';
+      textPreview.style.textShadow = '';
+      codeBox.innerText = `boxShadow: offset-x offset-y blur-radius spread-radius rgba(0, 0, 0, opacity) inset;
+textShadow: offset-x offset-y blur-radius rgba(0,0,0 opacity);`;
+      return;
+    }
+
+    const { boxShadow, textShadow } = convertToSyntax(css);
+    boxPreview.style.boxShadow = boxShadow;
+    textPreview.style.textShadow = textShadow;
+    codeBox.innerText = `boxShadow: ${boxShadow};
+textShadow: ${textShadow};`;
+  };
+
+  const initEvent = () => {
+    const btnClear = document.querySelector('.btn-clear');
+    const btnDefault = document.querySelector('.set-ps-default');
+    const btnToCss = document.querySelector('.generate-css');
+    const btnToPsd = document.querySelector('.generate-ps');
+    const formPs = document.querySelector('form.from-ps');
+    const formCss = document.querySelector('form.css3-box-shadow');
+    const inputsPs = formPs.querySelectorAll('input');
+    const inputsCss = formCss.querySelectorAll('input');
+
+    btnClear.addEventListener('click', () => {
+      formPs.reset();
+      formCss.reset();
+      displayPreview();
+    });
+
+    btnDefault.addEventListener('click', () => {
+      const ps = convertToPs();
+      const css = convertToCss(ps);
+      displayInputs(inputsPs, ps);
+      displayInputs(inputsCss, css);
+      displayPreview(css);
+    });
+
+    btnToCss.addEventListener('click', () => {
+      const inputValue = getDropValues();
+      const css = convertToCss(inputValue);
+      displayInputs(inputsCss, css);
+      displayPreview(css);
+    });
+
+    btnToPsd.addEventListener('click', () => {
+      const inputValue = getCssValues();
+      const ps = convertToPs(inputValue);
+      const css = convertToCss(ps);
+      displayInputs(inputsPs, ps);
+      displayPreview(css);
+    });
+  };
+
+  initEvent();
+  displayPreview();
 });
